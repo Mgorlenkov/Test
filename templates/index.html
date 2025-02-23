@@ -1,0 +1,53 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список задач</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #003b38;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 5px;
+            width: 300px;
+        }
+        button {
+            padding: 5px 10px;
+        }
+        ol {
+            list-style-type: decimal;
+        }
+        .task-actions {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список задач</h1>
+    <form method="post">
+        <input type="text" name="task" placeholder="Введите задачу" required>
+        <button type="submit">Добавить задачу</button>
+    </form>
+
+    <h2>Текущие задачи:</h2>
+    <ol>
+        {% for task in tasks %}
+            <li>
+                {{ task.description }}
+                <div class="task-actions">
+                    <a href="{{ url_for('update_task', task_id=task.id) }}">Изменить</a>
+                    <a href="{{ url_for('delete_task', task_id=task.id) }}">Удалить</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ol>
+</body>
+</html>
