@@ -6,7 +6,7 @@ from flask_migrate import Migrate
 from config import Config
 
 # Настройка логирования
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 app.config.from_object(Config)
