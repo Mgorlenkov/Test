@@ -1,8 +1,12 @@
 #app.py
+import logging
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
+
+# Настройка логирования
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -29,18 +33,30 @@ def index():
         if task_description:
             new_task = Task(description=task_description)
             db.session.add(new_task)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except Exception as e:
+                app.logger.error(f"Error committing task: {e}")
+                db.session.rollback()
         return redirect(url_for('index'))
     
-    tasks = Task.query.all()
+    try:
+        tasks = Task.query.all()
+    except Exception as e:
+        app.logger.error(f"Error querying tasks: {e}")
+        tasks = []
     return render_template('index.html', tasks=tasks)
 
 # Удаление задачи
 @app.route('/delete/<int:task_id>')
 def delete_task(task_id):
-    task = Task.query.get_or_404(task_id)
-    db.session.delete(task)
-    db.session.commit()
+    try:
+        task = Task.query.get_or_404(task_id)
+        db.session.delete(task)
+        db.session.commit()
+    except Exception as e:
+        app.logger.error(f"Error deleting task: {e}")
+        db.session.rollback()
     return redirect(url_for('index'))
 
 # Обновление задачи
@@ -49,7 +65,11 @@ def update_task(task_id):
     task = Task.query.get_or_404(task_id)
     if request.method == 'POST':
         task.description = request.form.get('task')
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            app.logger.error(f"Error updating task: {e}")
+            db.session.rollback()
         return redirect(url_for('index'))
     return render_template('update.html', task=task)
 
