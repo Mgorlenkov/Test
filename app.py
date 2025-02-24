@@ -4,7 +4,6 @@ import os
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade
-from flask.cli import with_appcontext
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.exc import OperationalError
 
@@ -29,13 +28,13 @@ class Task(db.Model):
         return f'<Task {self.description}>'
 
 # Функция для выполнения миграций
-@with_appcontext
 def apply_migrations():
     try:
         upgrade()
         logging.info("Migrations applied successfully.")
     except Exception as e:
         logging.error(f"Failed to apply migrations: {e}")
+        exit(1)
 
 # Функция для проверки подключения к базе данных
 def check_database_connection():
@@ -88,12 +87,16 @@ def check_database_connection():
     return True
 
 # Инициализация приложения
-@app.before_first_request
 def initialize_database():
     if not check_database_connection():
         logging.error("Database connection failed. Exiting...")
         exit(1)
     apply_migrations()
+
+# Вызов инициализации базы данных перед первым запросом
+@app.before_first_request
+def before_first_request():
+    initialize_database()
 
 # Главная страница с формой и списком задач
 @app.route('/', methods=['GET', 'POST'])
