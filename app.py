@@ -10,6 +10,7 @@ from sqlalchemy.exc import OperationalError
 # Настройка логирования
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Инициализация Flask приложения
 app = Flask(__name__)
 app.config.from_object('config.Config')
 
@@ -93,10 +94,8 @@ def initialize_database():
         exit(1)
     apply_migrations()
 
-# Вызов инициализации базы данных перед первым запросом
-@app.before_first_request
-def before_first_request():
-    initialize_database()
+# Вызов инициализации базы данных при создании приложения
+initialize_database()
 
 # Главная страница с формой и списком задач
 @app.route('/', methods=['GET', 'POST'])
