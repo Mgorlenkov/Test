@@ -7,3 +7,4 @@ gunicorn==20.1.0
 psycopg2-binary==2.9.5
 SQLAlchemy==1.4.46
 python-dotenv==1.0.0
+Werkzeug==2.3.3
