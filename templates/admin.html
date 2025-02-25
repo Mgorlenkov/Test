@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Админ-панель</h1>
+        <h2>Список пользователей:</h2>
+        <ul class="list-group">
+            {% for user in users %}
+                <li class="list-group-item">
+                    {{ user.username }} ({{ user.role }})
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Назад к списку задач</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger mt-3">Выйти</a>
+    </div>
+</body>
+</html>
