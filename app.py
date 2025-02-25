@@ -30,12 +30,13 @@ class Task(db.Model):
 
 # Функция для выполнения миграций
 def apply_migrations():
-    try:
-        upgrade()
-        logging.info("Migrations applied successfully.")
-    except Exception as e:
-        logging.error(f"Failed to apply migrations: {e}")
-        exit(1)
+    with app.app_context():
+        try:
+            upgrade()
+            logging.info("Migrations applied successfully.")
+        except Exception as e:
+            logging.error(f"Failed to apply migrations: {e}")
+            exit(1)
 
 # Функция для проверки подключения к базе данных
 def check_database_connection():
