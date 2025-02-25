@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Обновить задачу</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,24 +13,23 @@
         h1 {
             color: #333;
         }
-        form {
-            margin-bottom: 20px;
-        }
-        input[type="text"] {
-            padding: 5px;
-            width: 300px;
-        }
-        button {
-            padding: 5px 10px;
-        }
     </style>
 </head>
 <body>
-    <h1>Обновить задачу</h1>
-    <form method="post">
-        <input type="text" name="task" value="{{ task.description }}" required>
-        <button type="submit">Сохранить изменения</button>
-    </form>
-    <a href="{{ url_for('index') }}">Назад к списку задач</a>
+    <div class="container">
+        <h1>Обновить задачу</h1>
+        <form method="post">
+            <div class="form-group">
+                <label for="task">Описание задачи:</label>
+                <input type="text" class="form-control" id="task" name="task" value="{{ task.description }}" required>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="completed" name="completed" {% if task.completed %}checked{% endif %}>
+                <label class="form-check-label" for="completed">Выполнено</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Назад к списку задач</a>
+    </div>
 </body>
 </html>
