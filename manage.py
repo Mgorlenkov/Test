@@ -1,7 +1,7 @@
 # manage.py
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 import os
 
 # Инициализация приложения
@@ -18,7 +18,7 @@ migrate = Migrate(app, db)
 # Применение миграций
 with app.app_context():
     db.create_all()
-    migrate.upgrade()
+    upgrade()
 
 # Запуск приложения
 if __name__ == '__main__':
