@@ -2,3 +2,4 @@ tasks.db
 __pycache__/
 .env
 migrations/versions/025948e0460b_add_user_model_and_roles.py
+templates/index_old.html

@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 import os
+import unittest
 
 # Инициализация приложения
 app = Flask(__name__)
@@ -43,7 +44,7 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Маршруты
+# Маршрут для корневого URL
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -92,5 +93,38 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('index'))
 
+# Тесты
+class FlaskAppTestCase(unittest.TestCase):
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.app = app.test_client()
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_index_route(self):
+        response = self.app.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Welcome to the Home Page', response.data)
+
+    def test_register_route(self):
+        response = self.app.get('/register')
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_route(self):
+        response = self.app.get('/login')
+        self.assertEqual(response.status_code, 200)
+
+    def test_logout_route(self):
+        response = self.app.get('/logout')
+        self.assertEqual(response.status_code, 302)  # Должен быть редирект на логин
+
 if __name__ == '__main__':
+    # Запуск тестов
+    unittest.main(argv=[''], exit=False)
+
+    # Запуск приложения
     app.run(debug=True)
