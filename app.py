@@ -6,6 +6,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_bcrypt import Bcrypt
 import os
 import unittest
+from urllib.parse import parse_qs, urlencode
 
 # Инициализация приложения
 app = Flask(__name__)
@@ -44,10 +45,21 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Модель Task
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(250), nullable=False)
+    completed = db.Column(db.Boolean, default=False, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Task {self.description}>'
+
 # Маршрут для корневого URL
 @app.route('/')
 def index():
-    return render_template('index.html')
+    tasks = Task.query.all()
+    return render_template('index.html', tasks=tasks)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -93,6 +105,18 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('index'))
 
+@app.route('/filter_tasks', methods=['POST'])
+@login_required
+def filter_tasks():
+    status = request.form.get('status')
+    if status == 'completed':
+        tasks = Task.query.filter_by(completed=True).all()
+    elif status == 'not_completed':
+        tasks = Task.query.filter_by(completed=False).all()
+    else:
+        tasks = Task.query.all()
+    return render_template('index.html', tasks=tasks)
+
 # Тесты
 class FlaskAppTestCase(unittest.TestCase):
     def setUp(self):
@@ -108,7 +132,7 @@ class FlaskAppTestCase(unittest.TestCase):
     def test_index_route(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Welcome to the Home Page', response.data)
+        self.assertIn('Список задач', response.get_data(as_text=True))
 
     def test_register_route(self):
         response = self.app.get('/register')
@@ -121,6 +145,31 @@ class FlaskAppTestCase(unittest.TestCase):
     def test_logout_route(self):
         response = self.app.get('/logout')
         self.assertEqual(response.status_code, 302)  # Должен быть редирект на логин
+
+    def test_filter_tasks_route(self):
+        # Регистрация пользователя
+        self.app.post('/register', data={'username': 'testuser', 'password': 'testpass'})
+        # Вход пользователя
+        self.app.post('/login', data={'username': 'testuser', 'password': 'testpass'})
+        # Фильтрация задач
+        response = self.app.post('/filter_tasks', data={'status': 'completed'}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Список задач', response.get_data(as_text=True))
+
+    def test_register_user(self):
+        response = self.app.post('/register', data={'username': 'testuser', 'password': 'testpass'})
+        self.assertEqual(response.status_code, 302)  # Должен быть редирект на логин
+        user = User.query.filter_by(username='testuser').first()
+        self.assertIsNotNone(user)
+
+    def test_login_user(self):
+        # Регистрация пользователя
+        self.app.post('/register', data={'username': 'testuser', 'password': 'testpass'})
+
+        # Вход пользователя
+        response = self.app.post('/login', data={'username': 'testuser', 'password': 'testpass'}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Login successful.', response.get_data(as_text=True))
 
 if __name__ == '__main__':
     # Запуск тестов
