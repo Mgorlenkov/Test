@@ -3,7 +3,7 @@ services:
     name: my-flask-app
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python manage.py"
+    startCommand: "gunicorn app:app"
     envVars:
       - key: FLASK_APP
         value: app.py
@@ -13,3 +13,6 @@ services:
         fromSecret: DATABASE_URL
       - key: SECRET_KEY
         fromSecret: SECRET_KEY
+    ports:
+      - port: 5000
+        internalPort: 5000
