@@ -130,5 +130,27 @@ def add_task():
     flash('Task added successfully.')
     return redirect(url_for('index'))
 
+@app.route('/update_task/<int:task_id>', methods=['GET', 'POST'])
+@login_required
+def update_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if request.method == 'POST':
+        task.description = request.form['description']
+        task.completed = 'completed' in request.form
+        db.session.commit()
+        flash('Task updated successfully.')
+        return redirect(url_for('index'))
+
+    return render_template('update_task.html', task=task)
+
+@app.route('/delete_task/<int:task_id>', methods=['POST'])
+@login_required
+def delete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    db.session.delete(task)
+    db.session.commit()
+    flash('Task deleted successfully.')
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(debug=True)
