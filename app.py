@@ -6,7 +6,6 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_bcrypt import Bcrypt
 import os
 import unittest
-from urllib.parse import parse_qs, urlencode
 
 # Инициализация приложения
 app = Flask(__name__)
