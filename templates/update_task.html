@@ -3,13 +3,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Обновить задачу</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Обновить задачу</h1>
-        <form method="post">
+        <h1 class="text-center mt-5">Обновить задачу</h1>
+        <form method="post" class="mt-3">
             <div class="form-group">
                 <label for="description">Описание задачи:</label>
                 <input type="text" class="form-control" id="description" name="description" value="{{ task.description }}" required>
@@ -18,8 +19,10 @@
                 <input type="checkbox" class="form-check-input" id="completed" name="completed" {% if task.completed %}checked{% endif %}>
                 <label class="form-check-label" for="completed">Выполнено</label>
             </div>
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-            <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Отмена</a>
+            <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Отмена</a>
+            </div>
         </form>
     </div>
 </body>

@@ -3,6 +3,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список задач</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -20,12 +21,22 @@
             text-decoration: line-through;
             color: #888;
         }
+        @media (max-width: 768px) {
+            .task-actions {
+                display: block;
+                margin-top: 10px;
+            }
+            .task-actions a, .task-actions form {
+                display: block;
+                margin-bottom: 5px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Список задач</h1>
-        <div class="mb-3">
+        <h1 class="text-center">Список задач</h1>
+        <div class="mb-3 text-center">
             <a href="{{ url_for('register') }}" class="btn btn-info">Зарегистрироваться</a>
             <a href="{{ url_for('login') }}" class="btn btn-primary">Войти</a>
             {% if current_user.is_authenticated %}
@@ -35,7 +46,7 @@
                 {% endif %}
             {% endif %}
         </div>
-        <form method="post" action="{{ url_for('filter_tasks') }}">
+        <form method="post" action="{{ url_for('filter_tasks') }}" class="mb-3">
             <div class="form-group">
                 <label for="status">Фильтр по статусу:</label>
                 <select class="form-control" id="status" name="status">
@@ -47,22 +58,22 @@
             <button type="submit" class="btn btn-primary">Фильтровать</button>
         </form>
 
-        <form method="post" action="{{ url_for('add_task') }}" class="mt-3">
+        <form method="post" action="{{ url_for('add_task') }}" class="mb-3">
             <div class="form-group">
                 <input type="text" class="form-control" name="task" placeholder="Введите задачу" required>
             </div>
             <button type="submit" class="btn btn-success">Добавить задачу</button>
         </form>
 
-        <h2 class="mt-4">Текущие задачи:</h2>
+        <h2 class="mt-4 text-center">Текущие задачи:</h2>
         <ul class="list-group">
             {% for task in tasks %}
-                <li class="list-group-item">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="{% if task.completed %}completed{% endif %}">
                         {{ task.description }}
                     </span>
-                    <div class="task-actions float-right">
-                        <a href="{{ url_for('update_task', task_id=task.id) }}" class="btn btn-warning btn-sm">Изменить</a>
+                    <div class="task-actions">
+                        <a href="{{ url_for('update_task', task_id=task.id) }}" class="btn btn-warning btn-sm mr-2">Изменить</a>
                         <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
                         </form>
