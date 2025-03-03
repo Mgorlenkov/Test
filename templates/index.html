@@ -47,7 +47,7 @@
             <button type="submit" class="btn btn-primary">Фильтровать</button>
         </form>
 
-        <form method="post" class="mt-3">
+        <form method="post" action="{{ url_for('add_task') }}" class="mt-3">
             <div class="form-group">
                 <input type="text" class="form-control" name="task" placeholder="Введите задачу" required>
             </div>
