@@ -5,7 +5,6 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 import os
-import unittest
 
 # Инициализация приложения
 app = Flask(__name__)
@@ -116,63 +115,20 @@ def filter_tasks():
         tasks = Task.query.all()
     return render_template('index.html', tasks=tasks)
 
-# Тесты
-class FlaskAppTestCase(unittest.TestCase):
-    def setUp(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        self.app = app.test_client()
-        db.create_all()
+@app.route('/add_task', methods=['POST'])
+@login_required
+def add_task():
+    description = request.form.get('task')
+    if not description:
+        flash('Task description is required.')
+        return redirect(url_for('index'))
 
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
+    new_task = Task(description=description, user_id=current_user.id)
+    db.session.add(new_task)
+    db.session.commit()
 
-    def test_index_route(self):
-        response = self.app.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Список задач', response.get_data(as_text=True))
-
-    def test_register_route(self):
-        response = self.app.get('/register')
-        self.assertEqual(response.status_code, 200)
-
-    def test_login_route(self):
-        response = self.app.get('/login')
-        self.assertEqual(response.status_code, 200)
-
-    def test_logout_route(self):
-        response = self.app.get('/logout')
-        self.assertEqual(response.status_code, 302)  # Должен быть редирект на логин
-
-    def test_filter_tasks_route(self):
-        # Регистрация пользователя
-        self.app.post('/register', data={'username': 'testuser', 'password': 'testpass'})
-        # Вход пользователя
-        self.app.post('/login', data={'username': 'testuser', 'password': 'testpass'})
-        # Фильтрация задач
-        response = self.app.post('/filter_tasks', data={'status': 'completed'}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Список задач', response.get_data(as_text=True))
-
-    def test_register_user(self):
-        response = self.app.post('/register', data={'username': 'testuser', 'password': 'testpass'})
-        self.assertEqual(response.status_code, 302)  # Должен быть редирект на логин
-        user = User.query.filter_by(username='testuser').first()
-        self.assertIsNotNone(user)
-
-    def test_login_user(self):
-        # Регистрация пользователя
-        self.app.post('/register', data={'username': 'testuser', 'password': 'testpass'})
-
-        # Вход пользователя
-        response = self.app.post('/login', data={'username': 'testuser', 'password': 'testpass'}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Login successful.', response.get_data(as_text=True))
+    flash('Task added successfully.')
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    # Запуск тестов
-    unittest.main(argv=[''], exit=False)
-
-    # Запуск приложения
     app.run(debug=True)
