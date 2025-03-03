@@ -8,7 +8,6 @@ from alembic.config import Config
 from dotenv import load_dotenv
 import subprocess
 import sys
-import signal
 
 # Загрузка переменных окружения из файла .env
 load_dotenv()
@@ -46,17 +45,4 @@ with app.app_context():
 # Запуск app.py после применения миграций
 if __name__ == '__main__':
     print("Migrations applied. Starting app.py...")
-    process = subprocess.Popen([sys.executable, "app.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    try:
-        # Ждем завершения процесса
-        stdout, stderr = process.communicate()
-        if stdout:
-            print(stdout.decode())
-        if stderr:
-            print(stderr.decode())
-    except KeyboardInterrupt:
-        print("Shutting down app.py...")
-        process.terminate()
-        process.wait()
-        print("Server stopped.")
+    subprocess.run([sys.executable, "app.py"])

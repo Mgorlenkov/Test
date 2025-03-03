@@ -153,4 +153,6 @@ def delete_task(task_id):
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Получение порта из переменной окружения PORT, если она установлена, иначе 5000
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
